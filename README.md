@@ -43,6 +43,7 @@ Optional hidden start:
 - The switch to Codex is now triggered by a new Windows notification from the Codex app, not by `response.completed` in the Codex logs.
 - Window switching now uses ordinary Windows `Alt+Tab` behavior instead of directly forcing a Codex window handle to the foreground.
 - Settings UI runs locally at `http://127.0.0.1:5057`.
+- The settings page includes a visible On/Off toggle that enables or disables automatic switching without stopping the app.
 - You can configure SendKeys sequences for two separate moments: before switching from browser to Codex, and after switching back from Codex to browser.
 - The browser is restored when Codex logs a new `response.created` event, which means your new input was sent.
 - The browser is also restored immediately if Codex is focused and you press `1` or `2` while a browser return is pending.

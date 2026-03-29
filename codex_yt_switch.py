@@ -31,6 +31,7 @@ except ImportError:
 ROOT = Path(__file__).resolve().parent
 CONFIG_PATH = ROOT / "config.json"
 DEFAULT_CONFIG = {
+    "enabled": True,
     "poll_interval_seconds": 0.8,
     "switch_back_timeout_seconds": 120,
     "dedupe_window_seconds": 8,
@@ -67,80 +68,264 @@ SETTINGS_TEMPLATE = """
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Codex YT Switch Settings</title>
+  <title>Codex Browser Switch Settings</title>
   <style>
-    :root { color-scheme: light; --bg:#f6f3ee; --card:#fffdf8; --ink:#1e1b18; --accent:#b45309; --line:#e7dccd; }
-    body { margin:0; font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; background:linear-gradient(135deg,#f6f3ee,#efe6d8); color:var(--ink); }
-    .wrap { max-width:1280px; margin:40px auto; padding:24px; }
-    .layout { display:grid; grid-template-columns:minmax(0, 1.1fr) minmax(380px, 0.9fr); gap:24px; align-items:start; }
-    .card { background:var(--card); border:1px solid var(--line); border-radius:18px; padding:24px; box-shadow:0 18px 50px rgba(73,45,18,.08); }
-    h1 { margin:0 0 8px; font-size:34px; }
+    :root {
+      color-scheme: light;
+      --bg:#f5f5f5;
+      --bg-strong:#ededed;
+      --card:#ffffff;
+      --card-soft:#fafafa;
+      --ink:#1f1f1f;
+      --muted:#6b6b6b;
+      --accent:#2f2f2f;
+      --accent-deep:#1f1f1f;
+      --success:#1f7a4c;
+      --danger:#8b3a3a;
+      --line:#e5e5e5;
+      --shadow:0 4px 14px rgba(0,0,0,.04);
+    }
+    * { box-sizing:border-box; }
+    body {
+      margin:0;
+      font-family:"Aptos","Segoe UI",Tahoma,Geneva,Verdana,sans-serif;
+      background:linear-gradient(180deg, #f7f7f7 0%, #f2f2f2 100%);
+      color:var(--ink);
+    }
+    .wrap { max-width:1360px; margin:32px auto; padding:24px; }
+    .layout { display:grid; grid-template-columns:minmax(0, 1.18fr) minmax(360px, 0.82fr); gap:24px; align-items:start; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:20px; padding:24px; box-shadow:var(--shadow); }
+    .hero { position:relative; overflow:hidden; background:var(--card); }
+    h1 { margin:0 0 8px; font-size:38px; line-height:1.05; letter-spacing:-0.03em; }
     h2 { margin:0 0 10px; font-size:24px; }
     p { line-height:1.5; }
+    .hero-copy {
+      max-width:680px;
+      margin-bottom:20px;
+      color:var(--muted);
+      font-size:16px;
+    }
+    .priority-panel {
+      display:grid;
+      grid-template-columns:minmax(0, 1fr) auto;
+      gap:18px;
+      align-items:center;
+      margin:18px 0 22px;
+      padding:22px;
+      border-radius:18px;
+      border:1px solid var(--line);
+      background:#fbfbfb;
+    }
+    .priority-copy strong { display:block; font-size:22px; margin-bottom:6px; }
+    .priority-copy span { color:var(--muted); font-size:14px; }
+    .sections {
+      display:grid;
+      gap:18px;
+    }
+    .section-card {
+      padding:20px;
+      border-radius:16px;
+      background:var(--card-soft);
+      border:1px solid var(--line);
+    }
+    .section-card h2 { font-size:20px; margin-bottom:6px; }
+    .section-card p { margin:0 0 16px; color:var(--muted); font-size:14px; }
     .grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
-    label { display:block; font-weight:700; margin-bottom:6px; }
-    input, select { width:100%; padding:10px 12px; border-radius:10px; border:1px solid #ccbba5; background:#fff; font:inherit; }
+    label { display:block; font-weight:700; margin-bottom:6px; font-size:14px; }
+    input, select {
+      width:100%;
+      padding:12px 13px;
+      border-radius:12px;
+      border:1px solid #ccbba5;
+      background:#fffdfa;
+      color:var(--ink);
+      font:inherit;
+    }
+    input:focus, select:focus {
+      outline:none;
+      border-color:#bdbdbd;
+      box-shadow:0 0 0 3px rgba(0,0,0,.05);
+    }
     .full { grid-column:1 / -1; }
-    .hint { font-size:13px; color:#6c5a46; margin-top:6px; }
-    button { margin-top:12px; border:0; border-radius:999px; padding:12px 18px; background:var(--accent); color:white; font-weight:700; cursor:pointer; }
-    .status { margin:12px 0 0; font-weight:700; color:#166534; }
-    .muted { color:#6c5a46; font-size:13px; }
-    code { background:#f4eadb; padding:2px 6px; border-radius:6px; }
-    .logbox { height:70vh; min-height:520px; overflow:auto; padding:14px; border-radius:14px; border:1px solid #d8c7b4; background:#fffaf3; white-space:pre-wrap; font-family:Consolas, "Courier New", monospace; font-size:13px; line-height:1.45; }
-    @media (max-width: 980px) { .layout { grid-template-columns:1fr; } }
-    @media (max-width: 700px) { .grid { grid-template-columns:1fr; } }
+    .hint { font-size:13px; color:var(--muted); margin-top:7px; }
+    button {
+      margin-top:12px;
+      border:0;
+      border-radius:999px;
+      padding:13px 20px;
+      background:#2f2f2f;
+      color:white;
+      font-weight:800;
+      cursor:pointer;
+      box-shadow:none;
+    }
+    .status { margin:12px 0 0; font-weight:700; color:var(--success); }
+    .muted { color:var(--muted); font-size:13px; }
+    code { background:#f2e3d2; padding:2px 6px; border-radius:6px; }
+    .log-card {
+      background:var(--card);
+    }
+    .logbox {
+      height:72vh;
+      min-height:560px;
+      overflow:auto;
+      padding:16px;
+      border-radius:16px;
+      border:1px solid var(--line);
+      background:#fbfbfb;
+      white-space:pre-wrap;
+      font-family:Consolas, "Courier New", monospace;
+      font-size:13px;
+      line-height:1.5;
+    }
+    .toggle-form { margin:0; }
+    .toggle-button { margin:0; border:0; background:transparent; padding:0; cursor:pointer; }
+    .toggle-switch {
+      position:relative;
+      width:104px;
+      height:58px;
+      border-radius:999px;
+      background:#b54141;
+      box-shadow:inset 0 0 0 1px rgba(0,0,0,.06);
+      transition:background .22s ease;
+    }
+    .toggle-switch::after {
+      content:"";
+      position:absolute;
+      top:6px;
+      left:6px;
+      width:46px;
+      height:46px;
+      border-radius:50%;
+      background:#ffffff;
+      box-shadow:0 1px 3px rgba(0,0,0,.14);
+      transition:transform .22s ease;
+    }
+    .toggle-switch.is-on {
+      background:#228a57;
+    }
+    .toggle-switch.is-on::after { transform:translateX(46px); }
+    .toggle-label {
+      margin-top:10px;
+      text-align:center;
+      font-size:14px;
+      font-weight:800;
+      color:var(--ink);
+      letter-spacing:.02em;
+    }
+    .save-row {
+      display:flex;
+      justify-content:flex-end;
+      margin-top:18px;
+    }
+    .save-button { min-width:170px; }
+    @media (max-width: 980px) {
+      .layout { grid-template-columns:1fr; }
+      .priority-panel { grid-template-columns:1fr; }
+      .toggle-form { justify-self:start; }
+    }
+    @media (max-width: 700px) {
+      .grid { grid-template-columns:1fr; }
+      .wrap { padding:16px; }
+      .card { padding:20px; }
+      h1 { font-size:32px; }
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="layout">
-      <div class="card">
-        <h1>Codex YT Switch</h1>
-        <p>Adjust the live behavior here. Save applies to <code>config.json</code> and updates the running process immediately.</p>
-        {% if saved %}
-        <div class="status">Settings saved.</div>
-        {% endif %}
-        <form method="post">
+      <div class="card hero">
+        <h1>Codex Browser Switch</h1>
+        <p class="hero-copy">Control the switching behavior from one place. The main app state sits at the top, while the timing and browser settings stay below as secondary tuning controls.</p>
+        <div class="priority-panel">
+          <div class="priority-copy">
+            <strong>Automatic Switching</strong>
+            <span>Use this primary control to turn the automation on or off instantly. When off, the app keeps running, but it will not move windows on your behalf.</span>
+          </div>
+          <form method="post" class="toggle-form">
+            <input type="hidden" name="action" value="toggle_enabled">
+            <button type="submit" class="toggle-button" aria-label="Toggle app state">
+              <div class="toggle-switch {% if config.enabled %}is-on{% endif %}"></div>
+              <div class="toggle-label">{{ "On" if config.enabled else "Off" }}</div>
+            </button>
+          </form>
+        </div>
+        <form method="post" class="section-card">
+          <input type="hidden" name="action" value="save_settings">
+          <h2>Codex Log Source</h2>
+          <p>Set the SQLite log file that this app watches for Codex activity. The default points to your current local Codex setup, but other users can override it here.</p>
           <div class="grid">
-            <div>
-              <label for="switch_strategy">Switch strategy</label>
-              <select id="switch_strategy" name="switch_strategy">
-                <option value="alt_tab" {% if config.switch_strategy == 'alt_tab' %}selected{% endif %}>Alt+Tab</option>
-              </select>
-            </div>
-            <div>
-              <label for="switch_back_timeout_seconds">Return timeout (seconds)</label>
-              <input id="switch_back_timeout_seconds" name="switch_back_timeout_seconds" type="number" min="1" step="1" value="{{ config.switch_back_timeout_seconds }}">
-            </div>
-            <div>
-              <label for="switch_delay_seconds">Delay after switch (seconds)</label>
-              <input id="switch_delay_seconds" name="switch_delay_seconds" type="number" min="0" step="0.05" value="{{ config.switch_delay_seconds }}">
-            </div>
-            <div>
-              <label for="poll_interval_seconds">Poll interval (seconds)</label>
-              <input id="poll_interval_seconds" name="poll_interval_seconds" type="number" min="0.1" step="0.1" value="{{ config.poll_interval_seconds }}">
-            </div>
             <div class="full">
-              <label for="switch_to_sendkeys">Keys before switching from browser to Codex</label>
-              <input id="switch_to_sendkeys" name="switch_to_sendkeys" type="text" value="{{ config.switch_to_sendkeys }}">
-              <div class="hint">These keys are sent first, while the browser is still active. After that the app switches to Codex.</div>
-            </div>
-            <div class="full">
-              <label for="switch_back_sendkeys">Keys after switching back from Codex to browser</label>
-              <input id="switch_back_sendkeys" name="switch_back_sendkeys" type="text" value="{{ config.switch_back_sendkeys }}">
-              <div class="hint">The app switches back to the browser first, then sends these keys there. Examples: <code>{SPACE}</code>, <code>{ENTER}</code>, <code>^l</code>.</div>
-            </div>
-            <div class="full">
-              <label for="browser_process_names">Browser process names</label>
-              <input id="browser_process_names" name="browser_process_names" type="text" value="{{ ', '.join(config.browser_process_names) }}">
+              <label for="codex_log_db_path">Codex log database path</label>
+              <input id="codex_log_db_path" name="codex_log_db_path" type="text" value="{{ config.codex_log_db_path }}">
+              <div class="hint">Default: your current user path under <code>.codex\\logs_1.sqlite</code>. Saving updates the running watcher immediately.</div>
             </div>
           </div>
-          <button type="submit">Save settings</button>
+          <div class="save-row">
+            <button type="submit" class="save-button">Save log path</button>
+          </div>
         </form>
+        <div class="sections">
+          <form method="post" class="section-card">
+            <input type="hidden" name="action" value="save_settings">
+            <input type="hidden" name="codex_log_db_path" value="{{ config.codex_log_db_path }}">
+            <h2>Switching Behavior</h2>
+            <p>Core timing and routing for how the app moves between the browser and Codex.</p>
+            <div class="grid">
+              <div>
+                <label for="switch_strategy">Switch strategy</label>
+                <select id="switch_strategy" name="switch_strategy">
+                  <option value="alt_tab" {% if config.switch_strategy == 'alt_tab' %}selected{% endif %}>Alt+Tab</option>
+                </select>
+              </div>
+              <div>
+                <label for="switch_back_timeout_seconds">Return timeout (seconds)</label>
+                <input id="switch_back_timeout_seconds" name="switch_back_timeout_seconds" type="number" min="1" step="1" value="{{ config.switch_back_timeout_seconds }}">
+              </div>
+              <div>
+                <label for="switch_delay_seconds">Delay after switch (seconds)</label>
+                <input id="switch_delay_seconds" name="switch_delay_seconds" type="number" min="0" step="0.05" value="{{ config.switch_delay_seconds }}">
+              </div>
+              <div>
+                <label for="poll_interval_seconds">Poll interval (seconds)</label>
+                <input id="poll_interval_seconds" name="poll_interval_seconds" type="number" min="0.1" step="0.1" value="{{ config.poll_interval_seconds }}">
+              </div>
+            </div>
+            <div class="save-row">
+              <button type="submit" class="save-button">Save timing settings</button>
+            </div>
+          </form>
+          <form method="post" class="section-card">
+            <input type="hidden" name="action" value="save_settings">
+            <input type="hidden" name="codex_log_db_path" value="{{ config.codex_log_db_path }}">
+            <h2>Browser Actions</h2>
+            <p>Optional key sequences and browser process names used around the switch itself.</p>
+            <div class="grid">
+              <div class="full">
+                <label for="switch_to_sendkeys">Keys before switching from browser to Codex</label>
+                <input id="switch_to_sendkeys" name="switch_to_sendkeys" type="text" value="{{ config.switch_to_sendkeys }}">
+                <div class="hint">These keys are sent first, while the browser is still active. After that the app switches to Codex.</div>
+              </div>
+              <div class="full">
+                <label for="switch_back_sendkeys">Keys after switching back from Codex to browser</label>
+                <input id="switch_back_sendkeys" name="switch_back_sendkeys" type="text" value="{{ config.switch_back_sendkeys }}">
+                <div class="hint">The app switches back to the browser first, then sends these keys there. Examples: <code>{SPACE}</code>, <code>{ENTER}</code>, <code>^l</code>.</div>
+              </div>
+              <div class="full">
+                <label for="browser_process_names">Browser process names</label>
+                <input id="browser_process_names" name="browser_process_names" type="text" value="{{ ', '.join(config.browser_process_names) }}">
+              </div>
+            </div>
+            <div class="save-row">
+              <button type="submit" class="save-button">Save browser settings</button>
+            </div>
+          </form>
+        </div>
       </div>
-      <div class="card">
+      <div class="card log-card">
         <h2>Live Logs</h2>
-        <p class="muted">Readable Python status messages appear here live.</p>
+        <p class="muted">The technical side stays here. This panel shows the latest readable status output from the running helper.</p>
         <div id="logbox" class="logbox">Loading logs...</div>
       </div>
     </div>
@@ -196,6 +381,8 @@ def console_status(message: str) -> None:
 
     if "codex yt switch is starting." in lower:
         human_message = "Codex YT Switch is starting."
+    elif "app state changed: enabled=" in lower:
+        human_message = "App state changed to ON." if "enabled=true" in lower else "App state changed to OFF."
     elif "starting settings web server at" in lower:
         human_message = message.replace("Starting settings web server at ", "Settings page started at: ")
     elif "watching codex logs at:" in lower:
@@ -471,6 +658,12 @@ class CodexLogWatcher:
             emit(f"Failed to read initial last id from {self.db_path}: {exc!r}")
             return 0
 
+    def update_db_path(self, db_path: Path) -> None:
+        self.db_path = db_path
+        self.body_column = "message"
+        self.last_seen_id = self._read_last_id()
+        emit(f"Updated Codex log database path to: {self.db_path}")
+
     def pop_events(self) -> list[tuple[str, int, str]]:
         if not self.db_path.exists():
             return []
@@ -502,6 +695,7 @@ class SwitchController:
         self.codex_names = {name.lower() for name in config["codex_process_names"]}
         self.switch_strategy = config.get("switch_strategy", "alt_tab").lower()
         self.switch_back_hotkeys = self._parse_switch_back_hotkeys(config)
+        self.enabled = bool(config.get("enabled", True))
         self.pending_return: Optional[PendingReturn] = None
         self.last_trigger_at = 0.0
         self.last_trigger_id = 0
@@ -524,14 +718,19 @@ class SwitchController:
             self.codex_names = {name.lower() for name in config["codex_process_names"]}
             self.switch_strategy = config.get("switch_strategy", "alt_tab").lower()
             self.switch_back_hotkeys = self._parse_switch_back_hotkeys(config)
+            self.enabled = bool(config.get("enabled", True))
         emit(
             f"Applied new config: switch_strategy={self.switch_strategy} "
             f"switch_to_sendkeys={config.get('switch_to_sendkeys', '')!r} "
             f"switch_back_sendkeys={config.get('switch_back_sendkeys', '')!r}"
         )
+        emit(f"App state changed: enabled={self.enabled}")
 
     def handle_switch_to_codex(self, trigger_id: int, message: str) -> None:
         with self.lock:
+            if not self.enabled:
+                emit(f"Ignoring trigger_id={trigger_id} because the app is disabled.")
+                return
             if self.pending_return:
                 self.last_trigger_id = trigger_id
                 emit(
@@ -582,6 +781,9 @@ class SwitchController:
 
     def handle_switch_back(self, trigger_id: int, message: str) -> None:
         with self.lock:
+            if not self.enabled:
+                emit(f"Ignoring switch-back event row_id={trigger_id} because the app is disabled.")
+                return
             if not self.pending_return:
                 emit(f"Ignoring switch-back event row_id={trigger_id} because no pending return is active.")
                 return
@@ -647,6 +849,8 @@ class SwitchController:
         with self.lock:
             if not self.pending_return:
                 return
+            if not self.enabled:
+                return
             timeout = float(self.config["switch_back_timeout_seconds"])
             if time.time() - self.pending_return.activated_at <= timeout:
                 return
@@ -656,10 +860,11 @@ class SwitchController:
 
 
 class RuntimeState:
-    def __init__(self, config: dict, controller: SwitchController) -> None:
+    def __init__(self, config: dict, controller: SwitchController, watcher: CodexLogWatcher) -> None:
         self.lock = threading.Lock()
         self.config = config
         self.controller = controller
+        self.watcher = watcher
 
     def get_config(self) -> dict:
         with self.lock:
@@ -673,8 +878,19 @@ class RuntimeState:
             self.config["poll_interval_seconds"] = float(form.get("poll_interval_seconds", 0.8))
             self.config["switch_to_sendkeys"] = form.get("switch_to_sendkeys", "").strip()
             self.config["switch_back_sendkeys"] = form.get("switch_back_sendkeys", "").strip()
+            self.config["codex_log_db_path"] = (
+                form.get("codex_log_db_path", self.config["codex_log_db_path"]).strip()
+                or self.config["codex_log_db_path"]
+            )
             browsers = form.get("browser_process_names", "")
             self.config["browser_process_names"] = [part.strip() for part in browsers.split(",") if part.strip()]
+            save_config(self.config)
+            self.watcher.update_db_path(Path(self.config["codex_log_db_path"]))
+            self.controller.apply_config(self.config)
+
+    def toggle_enabled(self) -> None:
+        with self.lock:
+            self.config["enabled"] = not bool(self.config.get("enabled", True))
             save_config(self.config)
             self.controller.apply_config(self.config)
 
@@ -684,7 +900,11 @@ def create_web_routes(state: RuntimeState) -> None:
     def index():
         saved = False
         if request.method == "POST":
-            state.update_from_form(request.form)
+            action = request.form.get("action", "save_settings")
+            if action == "toggle_enabled":
+                state.toggle_enabled()
+            else:
+                state.update_from_form(request.form)
             saved = True
         config = state.get_config()
         return render_template_string(SETTINGS_TEMPLATE, config=config, saved=saved)
@@ -721,7 +941,7 @@ def main() -> None:
         config["switch_back_substrings"],
     )
     controller = SwitchController(config)
-    runtime_state = RuntimeState(config, controller)
+    runtime_state = RuntimeState(config, controller, watcher)
     last_heartbeat = 0.0
 
     emit("Codex YT Switch is starting.")
