@@ -13,6 +13,10 @@ In short, it does this:
 
 This project also includes a small local settings page so you can adjust timing, browser process names, SendKeys behavior, the watched Codex log database path, and whether the automation is currently enabled.
 
+## Interface Preview
+
+![Codex Browser Switch Flask interface](./codex%20switch.png)
+
 ## Files
 
 - `codex_yt_switch.py`: the background app
