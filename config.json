@@ -1,0 +1,36 @@
+{
+  "poll_interval_seconds": 0.8,
+  "switch_back_timeout_seconds": 120,
+  "dedupe_window_seconds": 8,
+  "heartbeat_interval_seconds": 30,
+  "switch_strategy": "alt_tab",
+  "switch_delay_seconds": 0.15,
+  "switch_to_sendkeys": "",
+  "switch_back_sendkeys": "",
+  "web_host": "127.0.0.1",
+  "web_port": 5057,
+  "browser_process_names": [
+    "chrome.exe",
+    "msedge.exe",
+    "firefox.exe",
+    "brave.exe",
+    "arc.exe"
+  ],
+  "codex_process_names": [
+    "Codex.exe",
+    "codex.exe",
+    "codex"
+  ],
+  "codex_log_db_path": "C:\\Users\\Magnus\\.codex\\logs_1.sqlite",
+  "debug_log_path": "C:\\Users\\Magnus\\Documents\\Studium\\Code\\openai-stuff\\codex-yt-switch\\codex_yt_switch.log",
+  "switch_back_substrings": [
+    "Received message {\"type\":\"response.created\""
+  ],
+  "codex_notification_app_substrings": [
+    "codex"
+  ],
+  "switch_back_hotkeys": [
+    "1",
+    "2"
+  ]
+}
