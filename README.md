@@ -1,14 +1,17 @@
-# Codex YT Switch
+# Codex Browser Switch
 
-This is a small Windows background helper for your Codex workflow.
+Codex Browser Switch is a small Windows helper that automatically moves you between your browser and the Codex desktop app at the right moments.
 
-It does this:
+The goal is simple: when Codex finishes and shows a Windows notification, the app can bring Codex to the foreground for you. When you send a new message, command approval, or other follow-up back to Codex, it can switch you back to the browser again. That way you do not have to keep manually alt-tabbing between both windows during a workflow.
+
+In short, it does this:
 
 1. Watches Windows toast notifications and reacts when Codex posts a new Windows notification.
-2. If your active window is a browser, it first sends any configured browser-side keys and then sends a normal Windows `Alt+Tab` to jump back to Codex.
+2. If your active window is a browser, it can send optional browser-side keys and then perform a normal Windows `Alt+Tab` to bring Codex forward.
 3. Once you send a new message or approval back to Codex, it detects the new Codex request in the logs.
-4. While Codex is focused, pressing `1` or `2` can also trigger the immediate jump back to the browser.
-5. After either return trigger, it sends `Alt+Tab` again to jump back to the browser and only then sends any configured browser-side return keys.
+4. Right after that, it can switch back to the browser and optionally send browser-side keys there.
+
+This project also includes a small local settings page so you can adjust timing, browser process names, SendKeys behavior, the watched Codex log database path, and whether the automation is currently enabled.
 
 ## Files
 
@@ -19,6 +22,12 @@ It does this:
 - `start_hidden.ps1`: optional hidden launcher, if you want it later
 
 ## Run it
+
+Install dependencies first:
+
+```powershell
+python -m pip install -r .\requirements.txt
+```
 
 Primary way:
 
@@ -44,7 +53,7 @@ Optional hidden start:
 - Window switching now uses ordinary Windows `Alt+Tab` behavior instead of directly forcing a Codex window handle to the foreground.
 - Settings UI runs locally at `http://127.0.0.1:5057`.
 - The settings page includes a visible On/Off toggle that enables or disables automatic switching without stopping the app.
+- The watched Codex log database path can be edited in the UI, so other users can override the default user-specific path.
 - You can configure SendKeys sequences for two separate moments: before switching from browser to Codex, and after switching back from Codex to browser.
 - The browser is restored when Codex logs a new `response.created` event, which means your new input was sent.
-- The browser is also restored immediately if Codex is focused and you press `1` or `2` while a browser return is pending.
 - The Windows notification listener needs user permission on Windows the first time it is used.

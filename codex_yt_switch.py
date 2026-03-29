@@ -379,8 +379,8 @@ def console_status(message: str) -> None:
     lower = message.lower()
     human_message = None
 
-    if "codex yt switch is starting." in lower:
-        human_message = "Codex YT Switch is starting."
+    if "codex browser switch is starting." in lower:
+        human_message = "Codex Browser Switch is starting."
     elif "app state changed: enabled=" in lower:
         human_message = "App state changed to ON." if "enabled=true" in lower else "App state changed to OFF."
     elif "starting settings web server at" in lower:
@@ -944,7 +944,7 @@ def main() -> None:
     runtime_state = RuntimeState(config, controller, watcher)
     last_heartbeat = 0.0
 
-    emit("Codex YT Switch is starting.")
+    emit("Codex Browser Switch is starting.")
     emit(f"Watching Codex logs at: {config['codex_log_db_path']}")
     emit(
         "Watching Windows notifications for Codex app names: "

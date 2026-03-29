@@ -1,3 +1,6 @@
+Flask
+psutil
+pywin32
 winrt-Windows.ApplicationModel
 winrt-Windows.Foundation
 winrt-Windows.Foundation.Collections
